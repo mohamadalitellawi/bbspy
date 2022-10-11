@@ -1,5 +1,5 @@
 
-from unittest import result
+from pathlib import Path
 import win32com.client
 import pythoncom
 
@@ -24,8 +24,25 @@ def main():
     active_document = get_cad_active_doc()
 #    print(link_barinfo_to_block(active_document))
 #    print(get_block_attributes(active_document))
-    print(get_dynamic_block_data(active_document))
+#    print(get_dynamic_block_data(active_document))
+    export_image(active_document)
     active_document= None
+
+
+
+def export_image(doc):
+    ss1 = get_selection_from_screen(doc)
+    for obj in ss1:
+        p1 = p2 = []
+        [p1,p2] = obj.GetBoundingBox(p1,p2)
+        p1 = aDouble(p1)
+        p2 = aDouble(p2)
+        print(p1,p2)
+        doc.Application.ZoomWindow(p1,p2)
+        filename = "shape" + obj.Handle
+        doc.export(filename, "WMF", ss1)
+        doc.Application.ZoomPrevious()
+
 
 def link_barinfo_to_block(doc):
     returnObj = None
