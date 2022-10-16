@@ -30,7 +30,7 @@ def main():
 
 
 
-def export_image(doc):
+def export_image(doc, filename):
     ss1 = get_selection_from_screen(doc)
     for obj in ss1:
         p1 = p2 = []
@@ -39,7 +39,6 @@ def export_image(doc):
         p2 = aDouble(p2)
         print(p1,p2)
         doc.Application.ZoomWindow(p1,p2)
-        filename = "Z:\\03 - Design\\ 300-ALI\\_From Omar\\16-10-2022\\" + "shape" + obj.Handle
         doc.export(filename, "WMF", ss1)
         doc.Application.ZoomPrevious()
 
