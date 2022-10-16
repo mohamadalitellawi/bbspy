@@ -21,12 +21,12 @@ class App:
         print("Please make a selection:")
         print("(M): repeat this Menu")
 
-        print("(A): Add Bar info and Shape")
-        print("(B): Create / Update Excel BBS")
+        print("(A): Add bar info and shape")
+        print("(B): create / update excel BBS")
 
-        print("(S): Apply Scale to bar info and shape")
-        print("(H): Get Object Handle")
-        print("(E): Export Image from Autocad Selection")
+        print("(S): apply Scale to bar info and shape")
+        print("(H): get object Handle")
+        print("(E): Export image from autocad selection")
 
         print("(X): eXit program")
 
@@ -75,7 +75,9 @@ class App:
                     if len(imagefilename) == 0: continue
                     if imagefilename.capitalize()[0] == "X": continue
 
-                    helpercad.export_image(helpercad.get_cad_active_doc(),imagefilename)
+                    active_doc = helpercad.get_cad_active_doc()
+                    if active_doc is not None:
+                        helpercad.export_image(active_doc,imagefilename)
                     
                 except Exception as e:
                     self.menu_error()

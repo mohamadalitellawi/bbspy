@@ -1,7 +1,10 @@
 
+
 from pathlib import Path
 import win32com.client
 import pythoncom
+from model_bar_block import BarBlockData
+from model_bar_info import BarInfoBlock
 
 # acad = win32com.client.Dispatch("AutoCAD.Application")
 # doc = acad.ActiveDocument
@@ -47,7 +50,59 @@ def link_barinfo_to_block(doc):
     returnObj = None
     basePnt = None
     [returnObj, basePnt] = doc.Utility.GetEntity (returnObj, basePnt, "Select an object")
-    return returnObj.Name
+    return returnObj.EffectiveName
+
+
+def get_cad_entity(doc, message = "Select an object: "):
+    returnObj = None
+    basePnt = None
+    try:
+        [returnObj, basePnt] = doc.Utility.GetEntity (returnObj, basePnt, message)
+        return returnObj
+    except:
+        print("failed to select cad entity")
+
+
+def get_bar_block_data(entity):
+    type = entity.ObjectName
+    id = entity.ObjectID
+    handle = entity.Handle
+    if type == 'AcDbBlockReference':
+        if not entity.IsDynamicBlock:
+            return
+        bar_block = BarBlockData()
+        bar_block.name = entity.EffectiveName
+        bar_block.id = id
+        bar_block.handle = handle
+        block_properties = entity.GetDynamicBlockProperties()
+        for block_property in block_properties:
+            bar_block.dimensions.append({block_property.PropertyName : block_property.Value})
+        return bar_block
+
+
+def update_bar_info(entity, bar_block:BarBlockData, bar_parameters):
+    type = entity.ObjectName
+    id = entity.ObjectID
+    handle = entity.Handle
+    if type == 'AcDbBlockReference':
+        if not entity.HasAttributes:
+            return
+        bar_info = BarInfoBlock()
+        bar_info.name = entity.EffectiveName
+        bar_info.id = id
+        bar_info.handle = handle
+        parameter = distance = ''
+        for attrib in entity.GetAttributes():
+            for x in bar_parameters:
+                if x['LEGNTH'] == attrib.TagString:
+                    parameter = x['PARAMETER']
+                    distance = x['REMARK']
+            #parameter, distance = [(x['PARAMETER'],x['REMARK']) for x in bar_parameters if x['LEGNTH'] == attrib.TagString]
+                    attr_field = fr'%<\AcObjProp Object(%<\_ObjId {bar_block.id}>%).Parameter({parameter}).{distance} \f "%lu2%pr0">%'
+                    print(attr_field)
+                    attrib.TextString = attr_field
+            
+            bar_info.attributes.append({attrib.TagString:attrib.TextString})
 
 
 def get_dynamic_block_data(doc):

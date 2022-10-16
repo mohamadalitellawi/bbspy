@@ -1,4 +1,5 @@
 from pathlib import Path
+import csv
 
 def main():
     p = Path('.')
@@ -43,6 +44,18 @@ def main():
     f = Path('tmp.txt')
     f.write_text("Hello World!")
     print(f.read_text())
+
+
+def get_parameters(parameter_file:Path):
+    with open(parameter_file.resolve(), newline='') as csvfile:
+        reader = csv.DictReader(csvfile)
+        parameters = []
+        for row in reader:
+            parameters.append(row)
+        return parameters
+
+
+
 
 if __name__ == "__main__":
     main()
