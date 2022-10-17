@@ -3,4 +3,5 @@ class BarInfoBlock:
         self.name = ''
         self.handle = ''
         self.id = ''
-        self.attributes = []
+        self.insertion_point = []
+        self.attributes = {}

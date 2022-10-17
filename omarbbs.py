@@ -1,4 +1,5 @@
 import helpercad
+import buisness
 
 class App:
     def __init__(self) -> None:
@@ -23,9 +24,8 @@ class App:
 
         print("(A): Add bar info and shape")
         print("(B): create / update excel BBS")
-
+        print("(C): Check bar bbs in autocad only")
         print("(S): apply Scale to bar info and shape")
-        print("(H): get object Handle")
         print("(E): Export image from autocad selection")
 
         print("(X): eXit program")
@@ -81,12 +81,29 @@ class App:
                     
                 except Exception as e:
                     self.menu_error()
-                    raise e
-
+                    #raise e
                 continue
 
 
+            elif selection[0] == 'S':
+                try:
+                    scale = input("Enter Shape Block Scale Factor: ")
+                    if len(scale) == 0: continue
+                    if scale.capitalize()[0] == "X": continue
+                    scale = float(scale)
+                    buisness.SHAPE_SCALE_FACTOR = scale
+                except Exception as e:
+                    self.menu_error()
+                    #raise e
+                continue
 
+            elif selection[0] == 'A':
+                try:
+                    buisness.link_Bar_Info()
+                except Exception as e:
+                    self.menu_error()
+                    #raise e
+                continue
 
 
 

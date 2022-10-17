@@ -20,7 +20,7 @@ def aVariant(vObject):
     return win32com.client.VARIANT(pythoncom.VT_ARRAY | pythoncom.VT_DISPATCH, (vObject))
 
 
-
+BAR_INFO_HEADER = ['BAR_MARK', 'BAR_INFO','BAR_LOCATION','BAR_SHAPE','VARIABLES']
 
 
 def main():
@@ -28,9 +28,21 @@ def main():
 #    print(link_barinfo_to_block(active_document))
 #    print(get_block_attributes(active_document))
 #    print(get_dynamic_block_data(active_document))
-    export_image(active_document)
+#    export_image(active_document)
+    get_point()
     active_document= None
 
+
+def get_point():
+    doc = get_cad_active_doc()
+    returnObj = None
+    basePnt = aDouble((0,0,0))
+    try:
+        returnObj = doc.Utility.GetPoint (basePnt, "select point")
+        print(returnObj)
+    except:
+        print("failed to get point from drawing")
+        raise
 
 
 def export_image(doc, filename):
@@ -74,35 +86,67 @@ def get_bar_block_data(entity):
         bar_block.name = entity.EffectiveName
         bar_block.id = id
         bar_block.handle = handle
+        bar_block.insertion_point = entity.InsertionPoint
         block_properties = entity.GetDynamicBlockProperties()
         for block_property in block_properties:
             bar_block.dimensions.append({block_property.PropertyName : block_property.Value})
         return bar_block
 
 
+
+
+
+def insert_block(doc, shape_blockname,bar_data:BarInfoBlock,scale = 1.0, message = 'Select Block Insertion Point: '):
+    doc.StartUndoMark()
+    returnObj = None
+    basePnt = aDouble(bar_data.insertion_point)
+    try:
+        returnObj = doc.Utility.GetPoint (basePnt, message)
+        #print(returnObj)
+        insertionPnt = aDouble(returnObj)
+        blockRefObj = doc.ModelSpace.InsertBlock(insertionPnt, shape_blockname, scale, scale, scale, 0)
+        doc.Utility.Prompt ("Shape Inserted!")
+        block_attributes = blockRefObj.GetAttributes()
+        for attrib in block_attributes:
+            for k,v in bar_data.attributes.items():
+                if attrib.TagString == k:
+                    attrib.TextString = v
+                    break
+    except:
+        print("failed to get point from drawing")
+        doc.Utility.Prompt ("Error Happend - Inserting Shape Block")
+        blockRefObj.Delete()
+    finally:
+        doc.EndUndoMark()
+
 def update_bar_info(entity, bar_block:BarBlockData, bar_parameters):
     type = entity.ObjectName
     id = entity.ObjectID
     handle = entity.Handle
+    bar_info = BarInfoBlock()
     if type == 'AcDbBlockReference':
         if not entity.HasAttributes:
             return
-        bar_info = BarInfoBlock()
         bar_info.name = entity.EffectiveName
         bar_info.id = id
         bar_info.handle = handle
+        bar_info.attributes['BAR_SHAPE'] = bar_block.get_original_name()
+        bar_info.insertion_point = entity.InsertionPoint
         parameter = distance = ''
         for attrib in entity.GetAttributes():
+            if attrib.TagString == 'BAR_SHAPE':
+                attrib.TextString = bar_block.get_original_name()
+            if attrib.TagString not in BAR_INFO_HEADER:
+                attrib.TextString = '0'
             for x in bar_parameters:
                 if x['LEGNTH'] == attrib.TagString:
                     parameter = x['PARAMETER']
                     distance = x['REMARK']
-            #parameter, distance = [(x['PARAMETER'],x['REMARK']) for x in bar_parameters if x['LEGNTH'] == attrib.TagString]
                     attr_field = fr'%<\AcObjProp Object(%<\_ObjId {bar_block.id}>%).Parameter({parameter}).{distance} \f "%lu2%pr0">%'
-                    print(attr_field)
+                    #print(attr_field)
                     attrib.TextString = attr_field
-            
-            bar_info.attributes.append({attrib.TagString:attrib.TextString})
+                    bar_info.attributes[str(attrib.TagString)] = attr_field
+    return bar_info
 
 
 def get_dynamic_block_data(doc):
