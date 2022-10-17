@@ -27,10 +27,16 @@ def check_bbs(error_layername = ERROR_LAYER_NAME):
         return
     try:
         helpercad.add_layer(doc,error_layername)
-        # TODO select all bar info blocks ang get the list
-        # TODO check the list for all errors and create new list for the problems
-        # TODO draw circles on the error layer
-        #Set circleObj = ThisDrawing.ModelSpace.AddCircle(centerPoint, radius)
+        selected_bar_info = helpercad.get_barinfo_list(doc)
+        barmarks = set([x.attributes['BAR_MARK'] for x in selected_bar_info])
+        grouped_bars = {}
+        for key in barmarks:
+            grouped_bars[key] = [x for x in selected_bar_info if x.attributes['BAR_MARK'] == key]
+            check_equality = BarInfoBlock.check_barmark_equality(grouped_bars[key])
+            for bar in grouped_bars[key]:
+                bar.has_problem = not check_equality
+        centers = [x.insertion_point for x in selected_bar_info if x.has_problem]
+        helpercad.draw_circles(doc,ERROR_LAYER_NAME,centers,ERROR_CIRCLE_RADIUS)
     finally:
         doc = None
 

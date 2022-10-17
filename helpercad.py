@@ -127,6 +127,42 @@ def insert_block(doc, shape_blockname,bar_data:BarInfoBlock,scale = 1.0, message
     finally:
         doc.EndUndoMark()
 
+def draw_circles(doc, layername, centers,radius):
+    for point in centers:
+        centerPoint = aDouble(point)
+        circleObj = doc.ModelSpace.AddCircle(centerPoint, radius)
+        circleObj.Layer = layername
+
+
+def get_barinfo_list(doc):
+    ss1 = get_selection_from_screen(doc)
+    if ss1 is None: return
+    result = []
+    for i in range(int(ss1.Count)):
+        entity = ss1.Item(i)
+        type = entity.ObjectName
+        if type != 'AcDbBlockReference':
+            continue
+        if not entity.HasAttributes:
+            continue
+        if entity.EffectiveName != 'BAR-INFO':
+            continue
+
+        bar_info = BarInfoBlock()
+        bar_info.id = entity.ObjectID
+        bar_info.handle = entity.Handle
+        bar_info.name = entity.EffectiveName
+        bar_info.insertion_point = entity.InsertionPoint
+
+        for attrib in entity.GetAttributes():
+            bar_info.attributes[attrib.TagString] = attrib.TextString
+
+        result.append(bar_info)
+
+    if len(result) > 0:
+        print(f'total selected {len(result)} bar info blocks')
+        return result
+
 def update_bar_info(entity, bar_block:BarBlockData, bar_parameters):
     type = entity.ObjectName
     id = entity.ObjectID
