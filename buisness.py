@@ -12,10 +12,27 @@ FILES = {
 
 SHAPE_SCALE_FACTOR = 1.0
 
+ERROR_LAYER_NAME = '_BBS_ERROR'
+ERROR_CIRCLE_RADIUS = 500
+
 parameters = helperfile.get_parameters(FILES['parameters'])
 
 def main():
-    link_Bar_Info()
+    #link_Bar_Info()
+    check_bbs()
+
+def check_bbs(error_layername = ERROR_LAYER_NAME):
+    doc = helpercad.get_cad_active_doc()
+    if doc is None:
+        return
+    try:
+        helpercad.add_layer(doc,error_layername)
+        # TODO select all bar info blocks ang get the list
+        # TODO check the list for all errors and create new list for the problems
+        # TODO draw circles on the error layer
+        #Set circleObj = ThisDrawing.ModelSpace.AddCircle(centerPoint, radius)
+    finally:
+        doc = None
 
 
 def link_Bar_Info():

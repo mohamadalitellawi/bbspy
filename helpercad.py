@@ -93,8 +93,16 @@ def get_bar_block_data(entity):
         return bar_block
 
 
-
-
+def add_layer(doc, layername):
+    try:
+        check_if_exist = False
+        for layer in doc.Layers:
+            if layername == layer.Name:
+                check_if_exist = True
+        if not check_if_exist:
+            doc.Layers.Add(layername)
+    except:
+        print("failed to add layer in drawing")
 
 def insert_block(doc, shape_blockname,bar_data:BarInfoBlock,scale = 1.0, message = 'Select Block Insertion Point: '):
     doc.StartUndoMark()
