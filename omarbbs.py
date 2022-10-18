@@ -106,6 +106,22 @@ class App:
                 continue
 
 
+            elif selection[0] == 'B':
+                try:
+                    buisness.send_selectedbars_to_excel()
+                except Exception as e:
+                    self.menu_error()
+                    #raise e
+                continue
+
+            elif selection[0] == 'C':
+                try:
+                    buisness.check_bbs()
+                except Exception as e:
+                    self.menu_error()
+                    #raise e
+                continue
+
 
 
 if __name__ == "__main__":
