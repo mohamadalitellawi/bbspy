@@ -25,6 +25,7 @@ class App:
         print("(A): Add bar info and shape")
         print("(B): create / update excel BBS")
         print("(C): Check bar bbs in autocad only")
+        print("(D): Delete Excel images")
         print("(S): apply Scale to bar info and shape")
         print("(E): Export image from autocad selection")
 
@@ -122,7 +123,13 @@ class App:
                     #raise e
                 continue
 
-
+            elif selection[0] == 'D':
+                try:
+                    buisness.clean_excel_bbs()
+                except Exception as e:
+                    self.menu_error()
+                    #raise e
+                continue
 
 if __name__ == "__main__":
     app = App()

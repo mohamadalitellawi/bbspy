@@ -22,6 +22,8 @@ def main():
     #link_Bar_Info()
     send_selectedbars_to_excel()
 
+def clean_excel_bbs():
+    helperexcel.delete_all_images()
 
 def send_selectedbars_to_excel():
     doc = helpercad.get_cad_active_doc()

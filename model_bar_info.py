@@ -73,7 +73,7 @@ class BarInfoBlock:
         for key in barmarks:
             grouped_bars[key] = [x for x in bar_list if x.attributes['BAR_MARK'] == key]
             check_equality = BarInfoBlock.check_barmark_equality(grouped_bars[key])
-        if check_equality:
-            return grouped_bars
-        else:
-            print('<<*****>>\tSelected Bar Info blocks are not equals\t<<*****>>')
+            if check_equality == False:
+                print('<<*****>>\tSelected Bar Info blocks are not equals\t<<*****>>')
+                return
+        return grouped_bars

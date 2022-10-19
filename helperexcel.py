@@ -10,7 +10,7 @@ EXCEL_COLUMNS = {'BAR_MARK':'B', 'BAR_DIA':'C', 'BAR_COUNT':'E', 'A':'K',
 BAR_INFO_DIMENSIONS = ['A','B','C','D','E','F','G','H']
 
 def main():
-    test1()
+    delete_all_images()
 
 
 def test1():
@@ -19,6 +19,12 @@ def test1():
 
     sheet = None
 
+
+def delete_all_images():
+    sheet = xw.sheets.active
+    for pic in sheet.pictures:
+        pic.delete()
+    sheet = None
 
 def add_bar(bar_info:BarInfoBlock,total_count, row = 17, images_folder = r'C:\BBS_SOURCE\IMG'):
     sheet = xw.sheets.active
