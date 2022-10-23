@@ -14,7 +14,7 @@ class App:
         print("-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-")
         print("~~~~~~ Welcome to Omar BBS App (by Abo Akram)! ~~~~~~")
         print("-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-")
-        print()
+        print('    -~-~-~-~REV 1.00\tDATE 23/10/2022~-~-~-~-')
 
 
     def menu_header(self):
@@ -23,10 +23,12 @@ class App:
         print("(M): repeat this Menu")
 
         print("(A): Add bar info and shape")
-        print("(B): create / update excel BBS")
+        print("(B): create excel BBS")
+        print("(U): Update excel bbs")
         print("(C): Check bar bbs in autocad only")
+        print("(R): Rename all dynamic blocks")
         print("(D): Delete Excel images")
-        print("(S): apply Scale to bar info and shape")
+        print("(S): apply Scale to bar shape")
         print("(E): Export image from autocad selection")
 
         print("(X): eXit program")
@@ -115,6 +117,15 @@ class App:
                     #raise e
                 continue
 
+
+            elif selection[0] == 'U':
+                try:
+                    buisness.update_selectedbars_to_excel()
+                except Exception as e:
+                    self.menu_error()
+                    #raise e
+                continue
+
             elif selection[0] == 'C':
                 try:
                     buisness.check_bbs()
@@ -130,6 +141,18 @@ class App:
                     self.menu_error()
                     #raise e
                 continue
+
+            elif selection[0] == 'R':
+                suffix = input("Enter Somthing to add after XX: ")
+                if len(suffix) == 0: continue
+                if suffix.capitalize()[0] == "X": continue
+                try:
+                    buisness.rename_all_dyn_blocks(suffix)
+                except Exception as e:
+                    self.menu_error()
+                    #raise e
+                continue
+
 
 if __name__ == "__main__":
     app = App()

@@ -29,8 +29,36 @@ def main():
 #    print(get_block_attributes(active_document))
 #    print(get_dynamic_block_data(active_document))
 #    export_image(active_document)
-    get_point()
+#    get_point()
+#    print(get_select_all(active_document))
+    rename_all_dyn_blocks(active_document)
     active_document= None
+
+def rename_all_dyn_blocks(doc,suffix = ''):
+    '''
+    ss1 = get_select_all(doc)
+    if ss1 is None: return
+    suffix = 'XX' + str(suffix)
+    for i in range(int(ss1.Count)):
+        entity = ss1.Item(i)
+        type = entity.ObjectName
+        id = entity.ObjectID
+        handle = entity.Handle
+        if type == 'AcDbBlockReference':
+            if entity.IsDynamicBlock:
+                block_new_name = entity.EffectiveName + suffix
+                entity.Name = 'tttttt'
+    '''
+    suffix = 'XX' + str(suffix)
+    for block in doc.Blocks:
+        entity = block
+        type = entity.ObjectName
+        #print(type)
+        if type == 'AcDbBlockTableRecord':
+            if entity.IsDynamicBlock:
+                block_new_name = entity.Name + suffix
+                entity.Name = block_new_name
+    doc.Utility.Prompt ("\nDone!")
 
 
 def get_point():
@@ -261,6 +289,31 @@ def get_cad_active_doc():
         return doc
     except:
         print('Error!:\t', 'we have a problem to connect with autocad')
+
+def get_select_all(doc):
+    ss_name = 'SS999'
+    acSelectionSetAll = 5
+
+    '''
+acSelectionSetWindow=0
+acSelectionSetCrossing=1
+acSelectionSetPrevious=3
+acSelectionSetLast=4
+acSelectionSetAll=5
+'''
+
+    try:
+        doc.SelectionSets.Item(ss_name).Delete()
+    except:
+        print("Delete selection failed")
+
+    ss1 = doc.SelectionSets.Add(ss_name)
+    try:
+        ss1.Select(acSelectionSetAll)
+        if int(ss1.Count) > 0:
+            return ss1
+    except:
+        print('Error!:\t', 'we have a problem to select from autocad')
 
 def get_selection_from_screen(doc):
     ss_name = 'SS999'

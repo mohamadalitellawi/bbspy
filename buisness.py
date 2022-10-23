@@ -41,6 +41,34 @@ def send_selectedbars_to_excel():
     finally:
         doc = None
 
+def update_selectedbars_to_excel():
+    doc = helpercad.get_cad_active_doc()
+    if doc is None:
+        return
+    try:
+        selected_bar_info = helpercad.get_barinfo_list(doc)
+        grouped_bars = BarInfoBlock.group_barlist_by_barmark(selected_bar_info)
+        existing_bars_data = helperexcel.get_existing_bar_data()
+        
+        for k,v in grouped_bars.items():
+            count = BarInfoBlock.get_total_count(v)
+            print(k,count)
+            row = helperexcel.get_free_row()
+            helperexcel.update_bar(v[0], count,row,existing_bars_data=existing_bars_data)
+
+    finally:
+        doc = None
+
+
+def rename_all_dyn_blocks(suffix):
+    doc = helpercad.get_cad_active_doc()
+    if doc is None:
+        return
+    try:
+        helpercad.rename_all_dyn_blocks(doc, suffix)
+    finally:
+        doc = None
+
 
 def check_bbs(error_layername = ERROR_LAYER_NAME):
     doc = helpercad.get_cad_active_doc()
